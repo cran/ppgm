@@ -5,11 +5,11 @@
 \title{ppgm}
 \usage{
 ppgm(occurrences, fossils = FALSE, trees, fossils.edges = FALSE, 
-model = "BM", permut = 1, only.biovars = TRUE, which.biovars = c(1:19), 
-path = "", plot.TraitGram = FALSE, plot.AnimatedMaps = FALSE, 
-plot.GeoRates = FALSE, bounds = list(), control = list(), 
-use.paleoclimate = TRUE, paleoclimateUser = NULL, layerAge=c(0:20), 
-verbose = TRUE)
+model = "BM", permut = 1, only.biovars = TRUE, 
+which.biovars = c(1:19), path = "", plot.TraitGram = FALSE, 
+plot.AnimatedMaps = FALSE, plot.GeoRates = FALSE, bounds = list(), 
+control = list(), use.paleoclimate = TRUE, paleoclimateUser = NULL, 
+layerAge=c(0:20), verbose = TRUE, use.parallel = FALSE)
 }
 \arguments{
 \item{occurrences}{a matrix with three columns of species name, longitude, and latitude, in that order, and rows that are entries for species occurrences. The bioclimate variables can be included for each occurrence in following columns. They must be in order 1 through 19.}
@@ -20,7 +20,7 @@ verbose = TRUE)
 
 \item{fossils.edges}{a vector of edges that the fossils belong to. Must be in the same order of the fossils argument. If fossils.edges is false, the the function randomly assigns the location of the fossils depending on the age (see details for more information).}
 
-\item{model}{the model of evolution to use to estimate ancestor nodes. Argument is passed onto to function nodeEstimate.}
+\item{model}{the model of evolution to use to estimate ancestor nodes. Argument is passed onto to function nodeEstimate. Options are "estimate", "BM", "OU", "EB", "lambda", "kappa", "delta", "rtrend, "mtrend".}
 
 \item{permut}{the number of times to randomly place fossils in phylogeny and estimate ancestor states.}
 
@@ -36,7 +36,7 @@ verbose = TRUE)
 
 \item{plot.GeoRates}{logical. Whether to plot GeoRates}
 
-\item{bounds}{parameters for the evolutionary model selected. If none are supplied the default is used}
+\item{bounds}{list of parameters for the evolutionary model selected. If none are supplied the default is used. If multiple biovars are selected, must include separate bounds for each variable.}
 
 \item{control}{settings used for optimisation of model likelihood. Passes to \code{geiger::fitContinuous}}
 
@@ -46,7 +46,9 @@ verbose = TRUE)
 
 \item{layerAge}{vector with the ages of the paleoclimate dataframes, if using user submitted paleoclimate data}
 
-\item{verbose}{default true, returns all outputs. If FALSE then returns only climate envelopes and geographic data}
+\item{verbose}{default TRUE, returns all outputs. If FALSE then returns only climate envelopes and geographic data}
+
+\item{use.parallel}{default FALSE, select TRUE to implement parallelisation}
 }
 \value{
 \code{cem} Estimate of climate envelope for each species in present time. A data frame containing species and min mean and max of biovars specified with \code{which.biovars}.
@@ -68,6 +70,8 @@ verbose = TRUE)
 \code{model_max} list of trees with maximum fitted model as specified in \code{model}
 
 \code{node_est} list of traits at each node for all trees, min and max for each species. As estimated by nodeEstimate and nodeEstimateEnvelopes
+
+\code{richnesscount} list for every tree, list of species richness for each geographic point at each paleoclimate slice
 
 \code{aicmin} if model is estimated, table of aic values for minimum trait values for all trees
 

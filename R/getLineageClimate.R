@@ -8,7 +8,7 @@
 #' @param use.paleoclimate if left blank, default North America paleoclimate data is used. If FALSE, user submitted paleoclimate must be provided
 #' @param paleoclimateUser list of data frames with paleoclimates, must be dataframes with columns: GlobalID, Longitude, Latitude, bio1, bio2,...,bio19. (see \code{getBioclimvars()}).
 #' @param layerAge vector with the ages of the paleoclimate dataframes, if using user submitted paleoclimate data
-#' @details Calculates rate of geographic change of all lineages. Outputs both the geographic center change, and the geographic size change.
+#' @details Calculates suitable climate for each specific lineage given reconstructed climate envelopes from \code{getEnvelopes()}. Returns dataframe of all estimated occurrences for every lineages for every time slice of paleoclimate.
 #' @return \code{matchedClim} list of occurrences points for each lineage, for each time slice of paleoclimate data
 #' @return \code{lineage} list of lineage specific nodes, as output from phangorn::Ancestors
 #' @author A. Michelle Lawing, Alexandra F. C. Howard, Maria A. Hurtado-Materon

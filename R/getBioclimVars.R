@@ -42,8 +42,22 @@ getBioclimVars <- function(occurrences, which.biovars=c(1:19), use.paleoclimate=
     return ("ERROR: There are less than three columns for the occurrences input. You need to have at least three (Species Name, Longitude, Latitude).")
   }
   if(dim(occurrences)[2]>3){
+    if(is.numeric(occurrences[1,1])){
+      temp <- array(NA, dim=c(length(occurrences[,1]), length(which.biovars)))
+      for(i in 1:length(occurrences[,1])){
+        layer <- which(abs(layerAge - occurrences[i,1]) == min(abs(layerAge - occurrences[i,1])))
+        if(length(layer)==2) {layer <- layer[1]}
+        anothertemp <- as.matrix(paleoclimate[[layer]][,2:3])
+        calc_dist <- fields::rdist.earth(anothertemp,t(as.matrix(occurrences[i,2:3])))
+        temp[i,] <- unlist(paleoclimate[[layer]][which.min(calc_dist),which.biovars+3])
+      }
+      occurrences <- cbind(occurrences,temp)
+      colnames(occurrences) <- c("MinAge","MaxAge", "Longitude", "Latitude", paste("bio",which.biovars,sep=""))
+      return(occurrences)
+    } else {
     occurrences<-occurrences[,c(1,2,3,which.biovars+3)]
     return (occurrences)
+    }
   }
   if(dim(occurrences)[2]==3){
     if(!is.numeric(occurrences[1,1])){
@@ -60,6 +74,7 @@ getBioclimVars <- function(occurrences, which.biovars=c(1:19), use.paleoclimate=
       temp <- array(NA, dim=c(length(occurrences[,1]), length(which.biovars)))
       for(i in 1:length(occurrences[,1])){
         layer <- which(abs(layerAge - occurrences[i,1]) == min(abs(layerAge - occurrences[i,1])))
+        if(length(layer)==2) {layer <- layer[1]}
         anothertemp <- as.matrix(paleoclimate[[layer]][,2:3])
         calc_dist <- fields::rdist.earth(anothertemp,t(as.matrix(occurrences[i,2:3])))
         temp[i,] <- unlist(paleoclimate[[layer]][which.min(calc_dist),which.biovars+3])

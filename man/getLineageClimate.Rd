@@ -29,7 +29,7 @@ use.paleoclimate=TRUE, paleoclimateUser=NULL, layerAge=c(0:20))
 This function calculates the suitable climate for each specific lineage, starting at the tips and going back through time to the root.
 }
 \details{
-Calculates rate of geographic change of all lineages. Outputs both the geographic center change, and the geographic size change.
+Calculates suitable climate for each specific lineage given reconstructed climate envelopes from \code{getEnvelopes()}. Returns dataframe of all estimated occurrences for every lineages for every time slice of paleoclimate.
 }
 \examples{
 data(sampletrees)

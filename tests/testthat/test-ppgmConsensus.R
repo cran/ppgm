@@ -12,7 +12,7 @@ test_that("ppgmConsensus works with original paleoclimate", {
   #test est
   tEs <- ppgmConsensus(testocc, trees=testtree, model="estimate", which.biovars=1, use.paleoclimate=F, paleoclimateUser=testclim, bounds=bounds)
   #test fossil
-  tfos <- ppgmConsensus(testocc, trees=testtree, fossils=testfos, which.biovars=1, use.paleoclimate=F, paleoclimateUser=testclim, plot.GeoRates=TRUE)
+  tfos <- ppgmConsensus(testocc, trees=testtree, model="BM", fossils=testfos, which.biovars=1, use.paleoclimate=F, paleoclimateUser=testclim, plot.GeoRates=TRUE)
   #checking outputs
   expect_equal(length(tBM$node_est[[1]]),4)
   expect_equal(length(tfos$node_est[[1]]),4)
@@ -32,7 +32,7 @@ test_that("ppgmConsensus works with new paleoclimate", {
   #test BM
   tBM  <- ppgmConsensus(testocc, trees=testtree, model="BM", which.biovars=1, use.paleoclimate=F, paleoclimateUser=newclim, layerAge=layerAge)
   #test fossil
-  tfos <- ppgmConsensus(testocc, trees=testtree, fossils=testfos, which.biovars=1, use.paleoclimate=F, paleoclimateUser=newclim, layerAge=layerAge)
+  tfos <- ppgmConsensus(testocc, trees=testtree, model="BM",fossils=testfos, which.biovars=1, use.paleoclimate=F, paleoclimateUser=newclim, layerAge=layerAge)
   #checking outputs
   expect_equal(length(tBM$node_est[[1]]),4)
   expect_equal(length(tfos$node_est[[1]]),4)

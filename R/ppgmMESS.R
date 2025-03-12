@@ -140,7 +140,7 @@ ppgmMESS <- function(cem_min, cem_max, est, tree, fossils=NULL, timeslice, which
       MESS_score[[p]][MESS_score[[p]][,b] > 0] <- 0
       #check on the size of graph and size of text
       if(which.plot == "all"){
-        grDevices::pdf(paste("MESS",timeslice[p],"Bio",which.biovars[b],".pdf",sep=""),width=80,height=80,pointsize=100,useDingbats = F)
+        grDevices::pdf(paste(path,"MESS",timeslice[p],"Bio",which.biovars[b],".pdf",sep=""),width=80,height=80,pointsize=100,useDingbats = F)
         plot(spdata,cex=1,xlab="",ylab="",axes=FALSE,pch=16,col="red")
         graphics::points(spdata,cex=1,pch=16,col=colorscheme[round(MESS_score[[p]][,b] - min(MESS_score[[p]][,b]) + 1)],xlim=c(-200,0),ylim=c(0,90))
         if(!is.null(fossils)){if(sum(fossils[,1]==(timeslice[p] + 1))!=0){
@@ -159,19 +159,19 @@ ppgmMESS <- function(cem_min, cem_max, est, tree, fossils=NULL, timeslice, which
         spdata <- sp::SpatialPoints(paleoclimate[[layer]][, 2:3])
         sp::proj4string(spdata)  <- sp::CRS("EPSG:4326")
         spdata <- sp::spTransform(spdata, sp::CRS("EPSG:26978"))
-        if(!is.null(fossils)){if(sum(fossils[, 1] == (timeslice[p] + 1)) != 0){
-          spfossils <- sp::SpatialPoints(fossils[, 2:3])
+        if(!is.null(fossils)){if(sum((ceiling(fossils[,1]) <= timeslice[p]) & (timeslice[p] <= floor(fossils[,2]))) != 0){
+          spfossils <- sp::SpatialPoints(fossils[, 3:4])
           sp::proj4string(spfossils)  <- sp::CRS("EPSG:4326")
           spfossils <- sp::spTransform(spfossils, sp::CRS("EPSG:26978"))
           spfossils@data[,1] <- fossils[, 1]
-          spfossils <- spfossils[fossils[, 1] == (timeslice[p] + 1), ]
+          spfossils <- spfossils[(ceiling(fossils[,1]) <= timeslice[p]) & (timeslice[p] <= floor(fossils[,2])), ]
           }
         }
         #print plots
-        grDevices::pdf(paste("MESS",timeslice[p],"Multi.pdf",sep=""),width=80,height=80,pointsize=100,useDingbats = F)
+        grDevices::pdf(paste(path,"MESS",timeslice[p],"Multi.pdf",sep=""),width=80,height=80,pointsize=100,useDingbats = F)
         plot(spdata,cex=1,xlab="",ylab="",axes=FALSE,pch=16,col="red")
         graphics::points(spdata,cex=1,pch=16,col=colorscheme[round(apply(MESS_score[[p]], 1, min) - min(MESS_score[[p]]) + 1)],xlim=c(-200,0),ylim=c(0,90))
-        if(!is.null(fossils)){if(sum(fossils[,1]==(timeslice[p] + 1))!=0){
+        if(!is.null(fossils)){if(sum((ceiling(fossils[,1]) <= timeslice[p]) & (timeslice[p] <= floor(fossils[,2])))!=0){
           points(spfossils,cex=2,pch=16,col="black")
          }
         }

@@ -12,7 +12,7 @@ control = list(), plot.est = FALSE)
 
 \item{traitnum}{the column number of the trait within the treedata object to be reconstructed.}
 
-\item{model}{the model of evolution to use in the ancestral state reconstruction. Options are "estimate", "BM", "OU", "EB", "lambda", "kappa", "delta".}
+\item{model}{the model of evolution to use in the ancestral state reconstruction. Options are "estimate", "BM", "OU", "EB", "lambda", "kappa", "delta", "mtrend","rtrend".}
 
 \item{bounds}{bounds used for the model, passes to \code{fitContinuous()}, uses default if none specified.}
 
@@ -41,6 +41,10 @@ an object of the class "nodeEstimate".
 
 \code{delta}    if model = "delta", returned values from \code{fitContinuous()} where the model is "delta"
 
+\code{mtrend}   if model = "mtrend', returned values from \code{fitContinuous() where the model is "mean_trend"}
+
+\code{rtrend}   if model = "rtrend', returned values from \code{fitContinuous() where the model is "rate_trend"}
+
 \code{fitted}   if model = "estimate", returned values from the best fit model of evolution.
 }
 \description{
@@ -52,7 +56,7 @@ See the \code{fitContinuous()} details for descriptions of the models of evoluti
 \examples{
 data(sampletrees)
 data(occurrences)
-occurrences <- getBioclimVars(occurrences, which.biovars=1)
+occurrences <- getBioclimVars(occurrences, which.biovars=4)
 sp_data_min<- tapply(occurrences[,4],occurrences$Species,min)
 ex <- geiger::treedata(sampletrees[[1]], sp_data_min)
 \donttest{nodeEstimate(ex, 1, model = 'OU')} #runs OU model

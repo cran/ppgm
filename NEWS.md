@@ -1,3 +1,16 @@
+# ppgm 1.1.0
+
+* Parallel processing added to ppgm in order to reduce processing time when analyzing large tree datasets
+* Added fix to getBioclimVars to assign fossils correct paleoclimate
+* Added vignette for new users
+* Added labelling to plotAnimatedPPGM and plotAnimatedPPGMMultiPhylo for each time slice
+* Changed gif saving in AnimatedPPGM functions from animation::saveGIF (which requires imageMagick) to gifski::save_gif (works with base R)
+* Corrected details of getLineageClimate function
+* Added evolutionary models to ppgm and ppgmConsensus (mtrend - mean_trend from fitContinuous; rtrend - rate_trend from fitContinuous)
+* Added fix in addFossil if fossil age is exactly between two paleoclimate ages - will select earlier age
+* Made sure fossils plot in MESS maps
+* Updated output of richnesscount in ppgm function to give all time periods
+
 # ppgm 1.0.3
 
 * Fixed .Rd files for CRAN resubmission

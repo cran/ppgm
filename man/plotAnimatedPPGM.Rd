@@ -5,7 +5,7 @@
 \title{plotAnimatedPPGM}
 \usage{
 plotAnimatedPPGM(envelope, tree, filename="ppgm.gif", which.biovars, 
-path="", use.paleoclimate=TRUE, paleoclimateUser=NULL, layerAge=c(0:20))
+path="", use.paleoclimate=TRUE, paleoclimateUser=NULL, layerAge=c(0:20), ...)
 }
 \arguments{
 \item{envelope}{the min and max envelope of each lineage for each time slice}
@@ -23,6 +23,8 @@ path="", use.paleoclimate=TRUE, paleoclimateUser=NULL, layerAge=c(0:20))
 \item{paleoclimateUser}{list of data frames with paleoclimates, must be dataframes with columns: GlobalID, Longitude, Latitude, bio1, bio2,...,bio19. (see \code{getBioclimvars()}).}
 
 \item{layerAge}{vector with the ages of the paleoclimate dataframes, if using user submitted paleoclimate data}
+
+\item{...}{other parameters to pass to save_gif}
 }
 \value{
 An animated gif of species through time

@@ -4,7 +4,7 @@
 #' control = list(), plot.est = FALSE)
 #' @param treedata.obj an object of the class "treedata".
 #' @param traitnum the column number of the trait within the treedata object to be reconstructed.
-#' @param model the model of evolution to use in the ancestral state reconstruction. Options are "estimate", "BM", "OU", "EB", "lambda", "kappa", "delta".
+#' @param model the model of evolution to use in the ancestral state reconstruction. Options are "estimate", "BM", "OU", "EB", "lambda", "kappa", "delta", "mtrend","rtrend".
 #' @param plot.est logical. whether or not to plot the traitgram of the estimated ancestor states.
 #' @param bounds bounds used for the model, passes to \code{fitContinuous()}, uses default if none specified.
 #' @param control setting used for optimization of the model likelihood. Passes to \code{fitContinuous()}.
@@ -19,6 +19,8 @@
 #' @return \code{lambda}   if model = "lambda", returned values from \code{fitContinuous()} where the model is "lambda"
 #' @return \code{kappa}    if model = "kappa", returned values from \code{fitContinuous()} where the model is "kappa"
 #' @return \code{delta}    if model = "delta", returned values from \code{fitContinuous()} where the model is "delta"
+#' @return \code{mtrend}   if model = "mtrend', returned values from \code{fitContinuous() where the model is "mean_trend"}
+#' @return \code{rtrend}   if model = "rtrend', returned values from \code{fitContinuous() where the model is "rate_trend"}
 #' @return \code{fitted}   if model = "estimate", returned values from the best fit model of evolution.
 #' @seealso \code{fitContinuous()}
 #' @references Butler, M. A. and King, A. A. (2004) Phylogenetic comparative analysis: a modeling approach for adaptive evolution. American Naturalist, 164:683-695.
@@ -37,11 +39,10 @@
 #' @examples
 #' data(sampletrees)
 #' data(occurrences)
-#' occurrences <- getBioclimVars(occurrences, which.biovars=1)
+#' occurrences <- getBioclimVars(occurrences, which.biovars=4)
 #' sp_data_min<- tapply(occurrences[,4],occurrences$Species,min)
 #' ex <- geiger::treedata(sampletrees[[1]], sp_data_min)
 #' \donttest{nodeEstimate(ex, 1, model = 'OU')} #runs OU model
-
 
 nodeEstimate <- function(treedata.obj, traitnum, model="BM", bounds=list(), control=list(), plot.est=FALSE) {
   x <- treedata.obj$data[,traitnum]
@@ -49,13 +50,15 @@ nodeEstimate <- function(treedata.obj, traitnum, model="BM", bounds=list(), cont
   was.estimated <- FALSE
   fitted <- model
   if(model=="estimate"){
-    models=c("BM","OU","EB","lambda","kappa","delta")
+    models=c("BM","OU","EB","lambda","kappa","delta","mtrend","rtrend")
     BM=try(geiger::fitContinuous(phy,x,model="BM",bounds=bounds,control=control),silent=T)
     OU=try(geiger::fitContinuous(phy,x,model="OU",bounds=bounds,control=control),silent=T)
     EB=try(geiger::fitContinuous(phy,x,model="EB",bounds=bounds, control=control),silent=T)
     lambda=try(geiger::fitContinuous(phy,x,model="lambda",bounds=bounds,control=control),silent=T)
     kappa=try(geiger::fitContinuous(phy,x,model="kappa",bounds=bounds,control=control),silent=T)
     delta=try(geiger::fitContinuous(phy,x,model="delta",bounds=bounds,control=control),silent=T)
+    if(!ape::is.ultrametric(phy)){rtrend=try(fitContinuous(phy,x,model="rate_trend",bounds=bounds,control=control),silent=T)} else {rtrend=NA}
+    if(!ape::is.ultrametric(phy)){mtrend=try(fitContinuous(phy,x,model="mean_trend",bounds=bounds,control=control),silent=T)} else {mtrend=BM}
     trait.macroevo <- list()
     for (mod in 1:length(models)){
       if(methods::is(eval(parse(text=models[mod])),"gfit")) {
@@ -79,20 +82,24 @@ nodeEstimate <- function(treedata.obj, traitnum, model="BM", bounds=list(), cont
     if (model=="lambda" & !methods::is(lambda,"try-error")) {if(!is.nan(lambda$opt$lambda)){phy=phytools::rescale(phy,model="lambda",lambda$opt$lambda)}}
     if(model=="kappa" & !methods::is(kappa,"try-error")) {if(!is.nan(kappa$opt$kappa)){phy=phytools::rescale(phy,model="kappa",kappa$opt$kappa)}}
     if(model=="delta" & !methods::is(delta,"try-error")) {if(!is.nan(delta$opt$delta)){phy=phytools::rescale(phy,model="delta",delta$opt$delta)}}
+    if(model=="rtrend" & !methods::is(rtrend,"try-error")) {if(!is.nan(rtrend$opt$slope)){phy=phytools::rescale(phy,model="trend",rtrend$opt$slope)}}
     was.estimated <- TRUE
   }
   if(!was.estimated){
-    if (model=="BM") {fitted<-BM<-try(geiger::fitContinuous(phy,x,model="BM",bounds=bounds,control=control),silent=T)}
-    if (model=="OU") {fitted<-OU<-try(geiger::fitContinuous(phy,x,model="OU",bounds=bounds,control=control),silent=T)
-    if(!methods::is(OU,"try-error")){ if(!is.nan(OU$opt$alpha)){phy=phytools::rescale(phy,model="OU",OU$opt$alpha)}}}
-    if (model =="EB"){fitted<-EB<-try(geiger::fitContinuous(phy,x,model="EB",bounds=bounds,control=control),silent=T)
-    if(!methods::is(EB,"try-error")){ if(!is.nan(EB$opt$a)){ phy=phytools::rescale(phy,model="EB",EB$opt$a)}}}
+    if (model=="BM")     {fitted<-BM<-try(geiger::fitContinuous(phy,x,model="BM",bounds=bounds,control=control),silent=T)}
+    if (model=="OU")     {fitted<-OU<-try(geiger::fitContinuous(phy,x,model="OU",bounds=bounds,control=control),silent=T)
+    if(!methods::is(OU,"try-error"))  {if(!is.nan(OU$opt$alpha)){phy=phytools::rescale(phy,model="OU",OU$opt$alpha)}}}
+    if (model =="EB")    {fitted<-EB<-try(geiger::fitContinuous(phy,x,model="EB",bounds=bounds,control=control),silent=T)
+    if(!methods::is(EB,"try-error"))  {if(!is.nan(EB$opt$a)){phy=phytools::rescale(phy,model="EB",EB$opt$a)}}}
     if (model=="lambda") {fitted<-lambda<-try(geiger::fitContinuous(phy,x,model="lambda",bounds=bounds,control=control),silent=T)
     if(!methods::is(lambda,"try-error")){if(!is.nan(lambda$opt$lambda)){phy=phytools::rescale(phy,model="lambda",lambda$opt$lambda)}}}
-    if(model=="kappa") {fitted<-kappa<-try(geiger::fitContinuous(phy,x,model="kappa",bounds=bounds,control=control),silent=T)
-    if(!methods::is(kappa,"try-error")){ if(!is.nan(kappa$opt$kappa)){ phy=phytools::rescale(phy,model="kappa",kappa$opt$kappa)}}}
-    if(model=="delta") {fitted<-delta<-try(geiger::fitContinuous(phy,x,model="delta",bounds=bounds,control=control),silent=T)
-    if(!methods::is(delta,"try-error")){ if(!is.nan(delta$opt$delta)){phy=phytools::rescale(phy,model="delta",delta$opt$delta)}}}
+    if(model=="kappa")   {fitted<-kappa<-try(geiger::fitContinuous(phy,x,model="kappa",bounds=bounds,control=control),silent=T)
+    if(!methods::is(kappa,"try-error")) {if(!is.nan(kappa$opt$kappa)){ phy=phytools::rescale(phy,model="kappa",kappa$opt$kappa)}}}
+    if(model=="delta")   {fitted<-delta<-try(geiger::fitContinuous(phy,x,model="delta",bounds=bounds,control=control),silent=T)
+    if(!methods::is(delta,"try-error")) {if(!is.nan(delta$opt$delta)){phy=phytools::rescale(phy,model="delta",delta$opt$delta)}}}
+    if (model=="rtrend")  {fitted <- rtrend <- try(geiger::fitContinuous(phy,x,model="rate_trend",bounds=bounds,control=control),silent=T)
+    if(!methods::is(rtrend,"try-error")) {if(!is.na(rtrend$opt$slope)){phy=rescale(phy,model="trend",rtrend$opt$slope)}}}
+    if (model=="mtrend") {fitted <- mtrend <- try(fitContinuous(phy, x, model="mean_trend", bounds=bounds, control=control), silent=T)}
   }
   #make sure phylo is phylo
   if(is(phy,"phylo")){
@@ -110,7 +117,7 @@ nodeEstimate <- function(treedata.obj, traitnum, model="BM", bounds=list(), cont
     GrandMean<-J%*%solve(varY)%*%x / J%*%solve(varY)%*%J
     node.est<- varAY%*%solve(varY)%*%(x-c(GrandMean)) + GrandMean[1,1]
   } else {
-    warning("In node.est(): singular matrix: using dist matrix without the rescale, revert to BM")
+    warning("In nodeEstimate(): singular matrix: using dist matrix without the rescale, revert to BM")
     M <- ape::dist.nodes(treedata.obj$phy)
     varAY <- M[-(1:nb.tip), 1:nb.tip]
     varY <- M[1:nb.tip,1:nb.tip]

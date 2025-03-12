@@ -16,7 +16,7 @@ test_that("ppgmMESS works", {
   c_mi <- cbind(tfos$cem[,1])
   c_ma <- cbind(tfos$cem[,3])
   rownames(c_mi) <- rownames(c_ma) <- rownames(tfos$cem)
-  sco2 <- ppgmMESS(c_mi,c_ma,tfos$node_est,tree=testtree,timeslice=10,which.biovars=1,fossils=testfos,which.plot="all")
+  sco2 <- ppgmMESS(c_mi,c_ma,tfos$node_est,tree=testtree,timeslice=10,which.biovars=1,fossils=testfos,which.plot="none")
   #checking outputs
   expect_length(sco[[1]],210)
   expect_length(sco2[[1]],9756)

@@ -6,10 +6,10 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of ppgm is to allow to produce PaleoPhyloGeographic Models
-(PPGM). This method reconstructs the evolutionary history of climate
-envelopes using phylogenetic comparative methods, incorporating both
-neontological and paleontological data.
+This package, ppgm allows the user to produce PaleoPhyloGeographic
+Models (PPGM). This method reconstructs the evolutionary history of
+climate envelopes using phylogenetic comparative methods, incorporating
+both neontological and paleontological data.
 
 ## Installation
 

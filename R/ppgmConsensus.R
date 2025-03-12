@@ -10,7 +10,7 @@
 #' @param fossils a matrix with four columns of min age, max age, longitude, and latitude, in that order, and rows that are entries for fossil occurrences. The bioclimate variables can be included for each occurrence in following columns. They must be in order 1 through 19. All 19 variables must be included at this stage, variable selection is done with the argument: "which.biovars".
 #' @param trees phylogeny of species from first column of occurrences argument. Object of class phylo.
 #' @param fossils.edges a vector of edges that the fossils belong to. Must be in the same order of the fossils argument. If fossils.edges is false, the the function randomly assigns the location of the fossils depending on the age (see details for more information).
-#' @param model the model of evolution to use to estimate ancestor nodes. Argument is passed onto to function nodeEstimate.
+#' @param model the model of evolution to use to estimate ancestor nodes. Argument is passed onto to function nodeEstimate. Options are "estimate", "BM", "OU", "EB", "lambda", "kappa", "delta", "rtrend, "mtrend". 
 #' @param permut the number of times to randomly place fossils in phylogeny and estimate ancestor states.
 #' @param only.biovars logical. If FALSE, user must include biovariables in occurrence object.
 #' @param which.biovars a vector with the biovars to include in model (see www.worldclim.org for a list of biovars). If "ALL", then all 19 biovars are included in analysis.
@@ -33,6 +33,7 @@
 #' @return \code{treedata_min} list of trees with minimum bioclimatic variables
 #' @return \code{treedata_max} list of trees with maximum bioclimatic variables
 #' @return \code{node_est} list of traits at each node for all trees, min and max for each species. As estimated by nodeEstimate and nodeEstimateEnvelopes
+#' @return \code{richnesscount} list for every tree, list of species richness for each geographic point at each paleoclimate slice
 #' @return \code{aicmin} if model is estimated, table of aic values for minimum trait values
 #' @return \code{aicmax} if model is estimated, table of aic values for maximum trait values
 #' @author A. Michelle Lawing, Alexandra F. C. Howard, Maria A. Hurtado-Materon
@@ -111,6 +112,30 @@ ppgmConsensus <- function(occurrences, fossils = FALSE, trees, fossils.edges = F
   geo_center <- temp$geo_center
   geo_size <- temp$geo_size
   time_int<-temp$time_int
+  #get richnesscount
+  sr_min<-lapply(1:length(paleoclimate),function(i){
+    temp<-lapply(1:length(which.biovars),function(j){getTimeSlice(layerAge[[i]],trees,envelope[,2,j])})
+    temp<-t(array(unlist(temp),dim=c(length(unlist(temp[[1]]$edge)),2*length(which.biovars))))
+    return(temp)})
+  sr_max<-lapply(1:length(paleoclimate),function(i){
+    temp<-lapply(1:length(which.biovars),function(j){getTimeSlice(layerAge[[i]],trees,envelope[,5,j])})
+    temp<-t(array(unlist(temp),dim=c(length(unlist(temp[[1]]$edge)),2*length(which.biovars))))
+    return(temp)})
+  richnesscount<-lapply(1:length(paleoclimate), function(j){
+    hld<-array(0,dim=length(paleoclimate[[j]][,1]))
+    if(length(sr_min[[j]][1,])==0){
+      hld <- 0
+    } else {
+      for(i in 1:length(sr_min[[j]][1,])){
+        matching<-sapply(1:length(which.biovars),function(x){paleoclimate[[j]][,which.biovars[x]+3]>sr_min[[j]][1:length(which.biovars)*2,i][x] & 
+            paleoclimate[[j]][,which.biovars[x]+3]<sr_max[[j]][1:length(which.biovars)*2,i][x]})
+        matching<-which(rowSums(matching)==length(which.biovars),arr.ind=TRUE)
+        hld[matching]<-hld[matching]+1
+      }
+    hld[which(hld==0,arr.ind=TRUE)]=NA
+    return(hld)
+    }
+  })  
   #plot permutations
   if(plot.TraitGram){
     plotTraitGram(treedata_min, treedata_max, node_est, fossils=fossils, which.biovars=which.biovars, path=path, paleoclimateUser=paleoclimateUser, use.paleoclimate=use.paleoclimate, layerAge=layerAge)
@@ -143,7 +168,11 @@ ppgmConsensus <- function(occurrences, fossils = FALSE, trees, fossils.edges = F
   print_table_max <- list()
   AICcmin <- AICcmax <- list()
   if(model=="estimate"){
-    models <- c("BM", "OU", "EB", "lambda", "kappa", "delta")
+    if(!ape::is.ultrametric(trees)){
+      models <- c("BM", "OU", "EB", "lambda", "kappa", "delta", "mtrend","rtrend")
+    } else {
+      models <-c("BM", "OU", "EB", "lambda", "kappa", "delta")
+    }
     for(traits in 1:length(model_min[[1]])){
       clean<-list()
       for(trees in 1:length(model_min)){
@@ -172,6 +201,7 @@ ppgmConsensus <- function(occurrences, fossils = FALSE, trees, fossils.edges = F
                 treedata_min=treedata_min,
                 treedata_max=treedata_max,
                 node_est=node_est,
+                richnesscount=richnesscount,
                 AICcmin=AICcmin,
                 AICcmax=AICcmax))
   }  else{

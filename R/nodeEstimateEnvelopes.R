@@ -8,7 +8,7 @@
 #' @param treedata_max tree data object with max estimate of the climate envelope
 #' @param fossils a matrix with three columns of age, longitude, and latitude, in that order, and rows that are entries for fossil occurrences.
 #' @param fossils.edges the edge number that the fossil occurs on
-#' @param model the model of evolution to use in the ancestral state reconstruction. Options are "estimate", "BM", "OU", "EB", "lambda", "kappa", "delta".
+#' @param model the model of evolution to use in the ancestral state reconstruction. Options are "estimate", "BM", "OU", "EB", "lambda", "kappa", "delta", "mtrend","rtrend".
 #' @param bounds bounds used for the model, passes to \code{fitContinuous()}, uses default if none specified.
 #' @param control setting used for optimization of the model likelihood. Passes to \code{fitContinuous()}.
 #' @param use.paleoclimate if left blank, default North America paleoclimate data is used. If FALSE, user submitted paleoclimate must be provided
@@ -26,6 +26,8 @@
 #' @return \code{lambda}   if model = "lambda", returned values from \code{fitContinuous()} where the model is "lambda"
 #' @return \code{kappa}    if model = "kappa", returned values from \code{fitContinuous()} where the model is "kappa"
 #' @return \code{delta}    if model = "delta", returned values from \code{fitContinuous()} where the model is "delta"
+#' @return \code{mtrend}  if model = "mtrend', returned values from \code{fitContinuous() where the model is "mean_trend"}
+#' @return \code{rtrend}  if model = "rtrend', returned values from \code{fitContinuous() where the model is "rate_trend"}
 #' @return \code{fitted}   if model = "estimate", returned values from the best fit model of evolution.
 #' @seealso \code{nodeEstimate}, \code{fitContinuous}
 #' @author A. Michelle Lawing, Alexandra F. C. Howard

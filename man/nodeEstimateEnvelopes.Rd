@@ -18,7 +18,7 @@ which.biovars = which.biovars)
 
 \item{fossils.edges}{the edge number that the fossil occurs on}
 
-\item{model}{the model of evolution to use in the ancestral state reconstruction. Options are "estimate", "BM", "OU", "EB", "lambda", "kappa", "delta".}
+\item{model}{the model of evolution to use in the ancestral state reconstruction. Options are "estimate", "BM", "OU", "EB", "lambda", "kappa", "delta", "mtrend","rtrend".}
 
 \item{bounds}{bounds used for the model, passes to \code{fitContinuous()}, uses default if none specified.}
 
@@ -52,6 +52,10 @@ an object of the class "nodeEstimate".
 \code{kappa}    if model = "kappa", returned values from \code{fitContinuous()} where the model is "kappa"
 
 \code{delta}    if model = "delta", returned values from \code{fitContinuous()} where the model is "delta"
+
+\code{mtrend}  if model = "mtrend', returned values from \code{fitContinuous() where the model is "mean_trend"}
+
+\code{rtrend}  if model = "rtrend', returned values from \code{fitContinuous() where the model is "rate_trend"}
 
 \code{fitted}   if model = "estimate", returned values from the best fit model of evolution.
 }

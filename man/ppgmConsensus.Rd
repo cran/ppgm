@@ -20,7 +20,7 @@ layerAge = c(0:20), verbose = TRUE)
 
 \item{fossils.edges}{a vector of edges that the fossils belong to. Must be in the same order of the fossils argument. If fossils.edges is false, the the function randomly assigns the location of the fossils depending on the age (see details for more information).}
 
-\item{model}{the model of evolution to use to estimate ancestor nodes. Argument is passed onto to function nodeEstimate.}
+\item{model}{the model of evolution to use to estimate ancestor nodes. Argument is passed onto to function nodeEstimate. Options are "estimate", "BM", "OU", "EB", "lambda", "kappa", "delta", "rtrend, "mtrend".}
 
 \item{permut}{the number of times to randomly place fossils in phylogeny and estimate ancestor states.}
 
@@ -64,6 +64,8 @@ layerAge = c(0:20), verbose = TRUE)
 \code{treedata_max} list of trees with maximum bioclimatic variables
 
 \code{node_est} list of traits at each node for all trees, min and max for each species. As estimated by nodeEstimate and nodeEstimateEnvelopes
+
+\code{richnesscount} list for every tree, list of species richness for each geographic point at each paleoclimate slice
 
 \code{aicmin} if model is estimated, table of aic values for minimum trait values
 
